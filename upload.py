@@ -1,7 +1,7 @@
 import bilibili.file as bF
 import bilibili.upload as bUpload
 
-bilibilicookies = "LIVE_BUVID=AUTO4715785517982541; DedeUserID=25437901;  SESSDATA=228af7e9%2C1585093835%2C48daa321; bili_jct=4d91f1d39d2a066feaf0c274622ad44c"
+bilibilicookies = "LIVE_BUVID=AUTO4715785517982541; DedeUserID=25437908;  SESSDATA=228af7e9%2C1585093835%2C48daa321; bili_jct=4d91f1d39d2a066feaf0c274622ad44c"
 
 
 json = {
@@ -25,7 +25,6 @@ json = {
 # 视频文件
 f = bF.File('/Users/chensk/Downloads/1582502173642103.mp4')
 
-# print(f.read(2500))
 
 bUpload = bUpload.Upload()
 bUpload.init('23333.mp4', f.size, bilibilicookies)  # '23333.mp4' 可以随便填，但必须有相应的视频格式后缀
