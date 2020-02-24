@@ -12,6 +12,7 @@ class Upload:
     upload_id = 0
     name = 0
     post_json = 0
+    thread_size = 1
 
     def __init__(self):
 
@@ -25,6 +26,7 @@ class Upload:
               % (self.name, size)
 
         self.json = data = json.loads(self.get(url))
+
         if data['OK'] == 1:
             self.url = 'https:' + data['endpoint'] + data['upos_uri'].split('upos:/')[1]
             self.get_upload_id()
@@ -41,7 +43,7 @@ class Upload:
 
         threads = []
 
-        for i in range(1, 16):
+        for i in range(1, self.thread_size+1):
             t = T(i, "Thread" + str(i), i, self, file)
             t.start()
             threads.append(t)
@@ -145,6 +147,7 @@ class T(threading.Thread):
 
         while True:
             put_size = self.upload.json['chunk_size']
+            print(put_size);
             threadLock.acquire()
             k = k + 1
             threadLock.release()
@@ -155,15 +158,15 @@ class T(threading.Thread):
 
             st_put_size = put_size * (k - 1)
             ed_put_size = put_size * p
-
+            print(self.upload.thread_size)
             if ed_put_size >= int(file.size):  # 当上传结束时数据大小大于等于 文件大小时
 
                 ed_put_size = file.size
                 put_size = int(ed_put_size) % put_size
-                if lock != 3:
+                if lock != self.upload.thread_size:
                     lock = lock + 1
 
-            if lock == 3:  # 当lock自增两次时上传完毕
+            if lock == self.upload.thread_size:  # 当lock自增两次时上传完毕
                 break
 
             files = file.read(self.upload.json['chunk_size'])
