@@ -12,7 +12,7 @@ class Upload:
     upload_id = 0
     name = 0
     post_json = 0
-    thread_size = 1
+    thread_size = 3
 
     def __init__(self):
 
@@ -39,9 +39,10 @@ class Upload:
         global lock, k, list
 
         k = 0
-        lock = 1  # 用于判断是否上传完毕
+        lock = 0  # 用于判断是否上传完毕
 
         threads = []
+       # print(int(int(file.size)/int(self.json['chunk_size'])));
 
         for i in range(1, self.thread_size+1):
             t = T(i, "Thread" + str(i), i, self, file)
@@ -55,6 +56,7 @@ class Upload:
         t = 0
         for i in list:
             json['parts'][t] = {'partNumber': i, 'eTag': 'etag'}
+            print(json['parts'][t]);
             t = t + 1
         self.end(json)
         print('上传完成')
@@ -64,7 +66,7 @@ class Upload:
         self.name, self.upload_id, str(self.json['biz_id']))
         print(self.post(self.url + src, json))
         url = 'https://member.bilibili.com/x/vu/web/add?csrf=' + self.csrf()
-        print(url)
+
         print(self.post_json)
         print(self.post(url, self.post_json))
 
@@ -99,6 +101,7 @@ class Upload:
         else:
             r = requests.post(url=url, headers=headers, json=json, timeout=10, verify=False)
         return r.content.decode()
+
 
     def put(self, url, file, put_size):
         headers = {
@@ -138,16 +141,17 @@ class T(threading.Thread):
         self.counter = counter
         self.upload = upload
         self.file = file
-
+        print(self.name)
     def run(self):
         global lock, k, list
 
         list = []
         file = self.file
-
+        #T(i, "Thread" + str(i), i, self, file)
         while True:
             put_size = self.upload.json['chunk_size']
-            print(put_size);
+            #1900000
+            #8388608
             threadLock.acquire()
             k = k + 1
             threadLock.release()
@@ -155,26 +159,25 @@ class T(threading.Thread):
             threadLock.acquire()
             p = k + 1 - 1
             threadLock.release()
-
+            #0 1 | 1-2 |2-3
             st_put_size = put_size * (k - 1)
             ed_put_size = put_size * p
-            print(self.upload.thread_size)
-            if ed_put_size >= int(file.size):  # 当上传结束时数据大小大于等于 文件大小时
 
+            if ed_put_size >= int(file.size):  # 当上传结束时数据大小大于等于 文件大小时
                 ed_put_size = file.size
                 put_size = int(ed_put_size) % put_size
-                if lock != self.upload.thread_size:
+                if lock != int(int(file.size)/int(self.json['chunk_size']))+2: #4
                     lock = lock + 1
-
-            if lock == self.upload.thread_size:  # 当lock自增两次时上传完毕
+            if lock == int(int(file.size)/int(self.json['chunk_size']))+2:
                 break
 
             files = file.read(self.upload.json['chunk_size'])
             src = '?partNumber=%s&uploadId=%s&chunk=%s&chunks=191&size=%s&start=%s&end=%s&total=%s' \
                   % (str(p), self.upload.upload_id, str(k), str(put_size), str(st_put_size), str(ed_put_size),
                      str(file.size))
+
             threadLock.acquire()
             list.append(p)
             threadLock.release()
-            print(src)
+
             print(self.upload.put(self.upload.url + src, files, put_size))
