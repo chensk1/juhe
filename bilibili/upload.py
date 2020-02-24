@@ -166,9 +166,9 @@ class T(threading.Thread):
             if ed_put_size >= int(file.size):  # 当上传结束时数据大小大于等于 文件大小时
                 ed_put_size = file.size
                 put_size = int(ed_put_size) % put_size
-                if lock != int(int(file.size)/int(self.json['chunk_size']))+2: #4
+                if lock != int(int(file.size)/int(self.upload.json['chunk_size']))+2: #4
                     lock = lock + 1
-            if lock == int(int(file.size)/int(self.json['chunk_size']))+2:
+            if lock == int(int(file.size)/int(self.upload.json['chunk_size']))+2:
                 break
 
             files = file.read(self.upload.json['chunk_size'])

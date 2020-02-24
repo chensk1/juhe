@@ -3,10 +3,11 @@ import json
 class GetInfo:
     cookies = 0
     json = 0
-    uname = 0;
-    mid = 0;
-    following = 0;
-    face = 0;
+    uname = 0
+    mid = 0
+    following = 0
+    face = 0
+    money = 0
     def __init__(self):
 
         pass
@@ -21,6 +22,7 @@ class GetInfo:
         self.json  = json.loads(self.get(url))
         self.uname = self.json['data']['uname']
         self.face = self.json['data']['face']
+        self.money = self.json['data']['money']
         self.mid = self.json['data']['wallet']['mid']
         url = "https://api.bilibili.com/x/relation/stat?jsonp=jsonp&vmid="+str(self.mid)
         self.json  = json.loads(self.get(url))
