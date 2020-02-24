@@ -25,7 +25,7 @@ class GetInfo:
         url = "https://api.bilibili.com/x/relation/stat?jsonp=jsonp&vmid="+str(self.mid)
         self.json  = json.loads(self.get(url))
         self.following = self.json['data']['following']
-        return  self;
+        return self;
     def get(self, url, data={}):
         headers = {
             "Accept": "*/*",
